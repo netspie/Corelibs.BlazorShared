@@ -15,24 +15,11 @@ namespace Corelibs.BlazorShared
             _onCatch = onCatch;
         }
 
-        public async Task<Result<TResponse>> Execute<TResponse>(IQuery<Result<TResponse>> query, CancellationToken cancellationToken = default)
+        public async Task<TResponse> Execute<TResponse>(IQuery<Result<TResponse>> query, CancellationToken cancellationToken = default)
         {
             try
             {
                 return await _decorated.Execute(query, cancellationToken);
-            }
-            catch (TException exception)
-            {
-                _onCatch.Invoke(exception);
-                return Result<TResponse>.Failure(exception.Message);
-            }
-        }
-
-        public async Task<TResponse> ExecuteForDTO<TResponse>(IQuery<Result<TResponse>> query, CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                return await _decorated.ExecuteForDTO(query, cancellationToken);
             }
             catch (TException exception)
             {
