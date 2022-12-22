@@ -17,23 +17,33 @@ namespace Corelibs.BlazorShared
         public async Task<TResponse> Get<TResponse>(CancellationToken cancellationToken = default)
         {
             var type = typeof(TResponse);
-            var resourceName = type.IsArray ? type.Name.Remove(type.Name.Length - 2, 2) : type.Name;
+            var resourcePath = type.IsArray ? type.Name.Remove(type.Name.Length - 2, 2) : type.Name;
+            return await _clientFactory.GetResource<TResponse, TAccessTokenNotAvailableException>(_signInRedirector, resourcePath, cancellationToken);
+        }
 
+    }
+
+    public static class Extes
+    {
+        public static async Task<TResponse> GetResource<TResponse, TAccessTokenNotAvailableException>(
+            this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, CancellationToken cancellationToken)
+            where TAccessTokenNotAvailableException : Exception
+        {
             try
             {
-                return await GetFromJsonAsync(AuthUserTypes.Authorized, resourceName);
+                return await clientFactory.GetFromJsonAsync<TResponse>(AuthUserTypes.Authorized, resourcePath, cancellationToken);
             }
             catch (TAccessTokenNotAvailableException accessTokenNotAvailableException)
             {
                 try
                 {
-                    return await GetFromJsonAsync(AuthUserTypes.Anonymous, resourceName);
+                    return await clientFactory.GetFromJsonAsync<TResponse>(AuthUserTypes.Anonymous, resourcePath, cancellationToken);
                 }
                 catch (HttpRequestException ex)
                 {
                     if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     {
-                        _signInRedirector.Redirect(accessTokenNotAvailableException);
+                        signInRedirector.Redirect(accessTokenNotAvailableException);
                         return default;
                     }
 
@@ -45,12 +55,12 @@ namespace Corelibs.BlazorShared
                     return default;
                 }
             }
+        }
 
-            Task<TResponse> GetFromJsonAsync(string clientName, string resourceName)
-            {
-                var client = _clientFactory.CreateClient(clientName);
-                return client.GetFromJsonAsync<TResponse>($"{resourceName}", cancellationToken);
-            }
+        private static Task<TResponse> GetFromJsonAsync<TResponse>(this IHttpClientFactory clientFactory, string clientName, string resourcePath, CancellationToken cancellationToken)
+        {
+            var client = clientFactory.CreateClient(clientName);
+            return client.GetFromJsonAsync<TResponse>($"{resourcePath}", cancellationToken);
         }
     }
 }
