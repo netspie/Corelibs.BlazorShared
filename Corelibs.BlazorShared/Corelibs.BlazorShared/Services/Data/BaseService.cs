@@ -23,5 +23,18 @@ namespace PageTree.Client.Shared.Services
 
             return _clientFactory.GetResource<TResponse>(_signInRedirector, resourcePathWithQuery, ct);
         }
+
+        protected Task<TResponse> GetResource<TApiQuery, TResponse>(TApiQuery apiQuery, string resourcePath, CancellationToken ct = default)
+        {
+            var queryString = apiQuery.GetQueryString();
+            var resourcePathWithQuery = $"{resourcePath}?{queryString}";
+
+            return _clientFactory.GetResource<TResponse>(_signInRedirector, resourcePathWithQuery, ct);
+        }
+
+        protected Task<HttpResponseMessage> PostResource(string resourcePath, CancellationToken ct = default)
+        {
+            return _clientFactory.PostResource(_signInRedirector, resourcePath, ct);
+        }
     }
 }

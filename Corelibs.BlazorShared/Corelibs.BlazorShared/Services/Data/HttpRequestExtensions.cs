@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+﻿using Common.Basic.Blocks;
+using Corelibs.Basic.Collections;
+using Mediator;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using System.Net.Http.Formatting;
 using System.Net.Http.Json;
 
@@ -7,7 +10,7 @@ namespace Corelibs.BlazorShared
     public static class HttpRequestExtensions
     {
         public static async Task<TResponse> GetResource<TResponse>(
-            this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, CancellationToken ct)
+            this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, CancellationToken ct = default)
         {
             try
             {
@@ -37,8 +40,17 @@ namespace Corelibs.BlazorShared
             }
         }
 
+        record EmptyBody();
+
+        public static Task<HttpResponseMessage> PostResource(
+           this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, CancellationToken ct = default)
+        {
+            return SendResource(signInRedirector, clientName => clientFactory.PostAsync(clientName, resourcePath, new EmptyBody(), ct));
+        }
+
         public static Task<HttpResponseMessage> PostResource<TBody>(
            this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, TBody body = default, CancellationToken ct = default)
+            where TBody : new()
         {
             return SendResource(signInRedirector, clientName => clientFactory.PostAsync(clientName, resourcePath, body, ct));
         }
@@ -98,8 +110,12 @@ namespace Corelibs.BlazorShared
             return HttpClientJsonExtensions.GetFromJsonAsync<TResponse>(client, resourcePath, ct);
         }
 
-        private static Task<HttpResponseMessage> PostAsync<TBody>(this IHttpClientFactory clientFactory, string clientName, string resourcePath, TBody body, CancellationToken ct) =>
-            clientFactory.CreateClientAndSendRequest(clientName, client => HttpClientJsonExtensions.PostAsJsonAsync(client, resourcePath, body, ct));
+        private static Task<HttpResponseMessage> PostAsync<TBody>(this IHttpClientFactory clientFactory, string clientName, string resourcePath, TBody body, CancellationToken ct)
+            where TBody : new()
+        {
+            body = body ?? new TBody();
+            return clientFactory.CreateClientAndSendRequest(clientName, client => HttpClientJsonExtensions.PostAsJsonAsync(client, resourcePath, body, ct));
+        }
 
         private static Task<HttpResponseMessage> PutAsync<TBody>(this IHttpClientFactory clientFactory, string clientName, string resourcePath, TBody body, CancellationToken ct) =>
             clientFactory.CreateClientAndSendRequest(clientName, client => HttpClientJsonExtensions.PutAsJsonAsync(client, resourcePath, body, ct));
