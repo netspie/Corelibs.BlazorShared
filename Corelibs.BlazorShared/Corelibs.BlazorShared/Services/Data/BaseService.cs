@@ -2,6 +2,8 @@
 using Corelibs.Basic.Collections;
 using Corelibs.BlazorShared;
 using Mediator;
+using System.Reflection;
+using System.Web;
 
 namespace PageTree.Client.Shared.Services
 {
@@ -27,6 +29,14 @@ namespace PageTree.Client.Shared.Services
         protected Task<TResponse> GetResource<TApiQuery, TResponse>(TApiQuery apiQuery, string resourcePath, CancellationToken ct = default)
         {
             var queryString = apiQuery.GetQueryString();
+            var resourcePathWithQuery = $"{resourcePath}?{queryString}";
+
+            return _clientFactory.GetResource<TResponse>(_signInRedirector, resourcePathWithQuery, ct);
+        }
+
+        protected Task<TResponse> GetResource<TApiQuery, TResponse>(TApiQuery apiQuery, string resourcePath, Type routeAttrType, CancellationToken ct = default)
+        {
+            var queryString = apiQuery.GetQueryString(routeAttrType);
             var resourcePathWithQuery = $"{resourcePath}?{queryString}";
 
             return _clientFactory.GetResource<TResponse>(_signInRedirector, resourcePathWithQuery, ct);
