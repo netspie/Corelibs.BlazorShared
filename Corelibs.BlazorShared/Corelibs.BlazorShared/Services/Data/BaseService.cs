@@ -1,11 +1,8 @@
 ﻿using Common.Basic.Blocks;
 using Corelibs.Basic.Collections;
-using Corelibs.BlazorShared;
 using Mediator;
-using System.Reflection;
-using System.Web;
 
-namespace PageTree.Client.Shared.Services
+namespace Corelibs.BlazorShared
 {
     public abstract class BaseService
     {
