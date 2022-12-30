@@ -50,13 +50,13 @@ namespace Corelibs.BlazorShared
 
         public static Task<HttpResponseMessage> PostResource<TBody>(
            this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, TBody body = default, CancellationToken ct = default)
-            where TBody : new()
+           where TBody : new()
         {
             return SendResource(signInRedirector, clientName => clientFactory.PostAsync(clientName, resourcePath, body, ct));
         }
 
         public static Task<HttpResponseMessage> PutResource<TBody>(
-           this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, object body, CancellationToken ct)
+           this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, TBody body, CancellationToken ct)
         {
             return SendResource(signInRedirector, clientName => clientFactory.PutAsync(clientName, resourcePath, body, ct));
         }
