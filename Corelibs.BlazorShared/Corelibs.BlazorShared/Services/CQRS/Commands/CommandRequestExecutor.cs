@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Common.Basic.Blocks;
+using Corelibs.Basic.Architecture.CQRS.Command.Types;
 using Mediator;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Corelibs.BlazorShared
 {
@@ -17,21 +19,29 @@ namespace Corelibs.BlazorShared
             _baseRoute = baseRoute;
         }
 
-        async Task<Result> ICommandExecutor.Execute(ICommand<Result> command, CancellationToken ct = default)
+        async Task<Result> ICommandExecutor.Execute<TCommand>(TCommand command, CancellationToken ct = default)
         {
-            var type = command.GetType();
+            var type = typeof(TCommand);
             if (!_requestsPerType.TryGetValue(type, out var request))
                 return null;
 
-            var response = await request(request);
+            var response = await request(command);
             if (response == null || !response.IsSuccessStatusCode)
                 return Result.Failure();
 
             return Result.Success();
         }
 
-        public void Add<TRequest>(Func<TRequest, Task<HttpResponseMessage>> request) =>
-            _requestsPerType.Add(typeof(TRequest), requestObject => request((TRequest)requestObject));
+        public void Add<TRequest>(Func<TRequest, Task<HttpResponseMessage>> request)
+        {
+            _requestsPerType.Add(typeof(TRequest), SendRequestLocal);
+
+            Task<HttpResponseMessage> SendRequestLocal(object requestObject)
+            {
+                var requestObjectTyped = (TRequest) requestObject;
+                return request(requestObjectTyped);
+            }
+        }
 
         public void AddPost<TAppCommand, TApiCommand>(string resourceRoute)
         {
@@ -40,9 +50,10 @@ namespace Corelibs.BlazorShared
         }
 
         public void AddPut<TAppCommand, TApiCommand>(string resourceRoute)
+            where TAppCommand : IReplaceCommand
         {
             var fullResourceRoute = $"{_baseRoute}/{resourceRoute}";
-            Add<TAppCommand>(c => PutResource<TAppCommand, TApiCommand>(fullResourceRoute, c));
+            Add<TAppCommand>(c => PutResource<TAppCommand, TApiCommand>($"{fullResourceRoute}/{c.ID}", c));
         }
 
         public void AddPost<TAppCommand>(string resourceRoute)

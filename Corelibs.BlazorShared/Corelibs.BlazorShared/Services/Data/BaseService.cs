@@ -1,4 +1,5 @@
 ﻿using Common.Basic.Blocks;
+using Common.Basic.Collections;
 using Corelibs.Basic.Collections;
 using Mediator;
 
@@ -34,7 +35,7 @@ namespace Corelibs.BlazorShared
         protected Task<TResponse> GetResource<TApiQuery, TResponse>(TApiQuery apiQuery, string resourcePath, Type routeAttrType, CancellationToken ct = default)
         {
             var queryString = apiQuery.GetQueryString(routeAttrType);
-            var resourcePathWithQuery = $"{resourcePath}?{queryString}";
+            var resourcePathWithQuery = queryString.IsNullOrEmpty() ? resourcePath : $"{resourcePath}?{queryString}";
 
             return _clientFactory.GetResource<TResponse>(_signInRedirector, resourcePathWithQuery, ct);
         }

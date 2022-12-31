@@ -5,7 +5,8 @@ namespace Corelibs.BlazorShared
 {
     public interface ICommandExecutor
     {
-        Task<Result> Execute(ICommand<Result> command, CancellationToken cancellationToken = default);
+        Task<Result> Execute<TCommand>(TCommand command, CancellationToken cancellationToken = default)
+            where TCommand : ICommand<Result>;
 
         Task<Result> Execute<TCommand>(CancellationToken cancellationToken = default)
             where TCommand : ICommand<Result>, new()

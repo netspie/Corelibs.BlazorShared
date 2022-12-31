@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Common.Basic.Blocks;
-using Common.Basic.CQRS.Query;
+using Corelibs.Basic.Architecture.CQRS.Query.Types;
 using Corelibs.Basic.Net;
 using Mediator;
 
@@ -18,9 +18,9 @@ namespace Corelibs.BlazorShared
             : base(mapper, clientFactory, signInRedirector)
         {}
 
-        async Task<TResponse> IQueryExecutor.Execute<TResponse>(IQuery<Result<TResponse>> query, CancellationToken ct = default)
+        async Task<TResponse> IQueryExecutor.Execute<TQuery, TResponse>(TQuery query, CancellationToken ct = default)
         {
-            var type = query.GetType();
+            var type = typeof(TQuery);
             if (!_requestsPerType.TryGetValue(type, out var request))
                 return default;
 
