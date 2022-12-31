@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Common.Basic.Blocks;
 using Common.Basic.CQRS.Query;
+using Corelibs.Basic.Net;
 using Mediator;
 
 namespace Corelibs.BlazorShared
