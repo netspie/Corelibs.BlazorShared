@@ -45,15 +45,18 @@ namespace Corelibs.BlazorShared
         }
 
         protected Task<HttpResponseMessage> PostResource<TBody>(string resourcePath, TBody body, CancellationToken ct = default)
-           where TBody : new()
         {
             return _clientFactory.PostResource(_signInRedirector, resourcePath, body, ct);
         }
 
         protected Task<HttpResponseMessage> PutResource<TBody>(string resourcePath, TBody body, CancellationToken ct = default)
-           where TBody : new()
         {
             return _clientFactory.PutResource(_signInRedirector, resourcePath, body, ct);
+        }
+
+        protected Task<HttpResponseMessage> PatchResource<TBody>(string resourcePath, TBody body, CancellationToken ct = default)
+        {
+            return _clientFactory.PatchResource(_signInRedirector, resourcePath, body, ct);
         }
     }
 }

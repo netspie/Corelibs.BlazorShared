@@ -5,10 +5,17 @@ namespace Corelibs.BlazorShared
 {
     public interface ICommandExecutor
     {
-        Task<Result<TResponse>> Execute<TResponse>(ICommand<Result<TResponse>> command, CancellationToken cancellationToken = default);
+        Task<Result> Execute(ICommand<Result> command, CancellationToken cancellationToken = default);
 
-        Task<TResponse> ExecuteForValue<TResponse>(ICommand<Result<TResponse>> command, CancellationToken cancellationToken = default);
+        Task<Result> Execute<TCommand>(CancellationToken cancellationToken = default)
+            where TCommand : ICommand<Result>, new()
+            => Execute(new TCommand(), cancellationToken);
 
-        Task Execute<TResponse>(ICommand<Result> command, CancellationToken cancellationToken = default);
+        Task<Result> Execute<TCommand>(string id, CancellationToken cancellationToken = default)
+            where TCommand : ICommand<Result>
+        {
+            var command = (TCommand) Activator.CreateInstance(typeof(TCommand), id);
+            return Execute(command, cancellationToken);
+        }
     }
 }

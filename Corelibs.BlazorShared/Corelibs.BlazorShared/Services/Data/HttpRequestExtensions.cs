@@ -50,7 +50,6 @@ namespace Corelibs.BlazorShared
 
         public static Task<HttpResponseMessage> PostResource<TBody>(
            this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, TBody body = default, CancellationToken ct = default)
-           where TBody : new()
         {
             return SendResource(signInRedirector, clientName => clientFactory.PostAsync(clientName, resourcePath, body, ct));
         }
@@ -111,9 +110,7 @@ namespace Corelibs.BlazorShared
         }
 
         private static Task<HttpResponseMessage> PostAsync<TBody>(this IHttpClientFactory clientFactory, string clientName, string resourcePath, TBody body, CancellationToken ct)
-            where TBody : new()
         {
-            body = body ?? new TBody();
             return clientFactory.CreateClientAndSendRequest(clientName, client => HttpClientJsonExtensions.PostAsJsonAsync(client, resourcePath, body, ct));
         }
 
