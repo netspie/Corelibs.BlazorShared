@@ -1,4 +1,5 @@
 ﻿using Common.Basic.Blocks;
+using Corelibs.Basic.Reflection;
 using Mediator;
 
 namespace Corelibs.BlazorShared
@@ -15,7 +16,17 @@ namespace Corelibs.BlazorShared
         Task<Result> Execute<TCommand>(string id, CancellationToken cancellationToken = default)
             where TCommand : ICommand<Result>
         {
-            var command = (TCommand) Activator.CreateInstance(typeof(TCommand), id);
+            TCommand command;
+            try
+            {
+                command = (TCommand) Activator.CreateInstance(typeof(TCommand), id);
+            }
+            catch(MissingMethodException)
+            {
+                command = (TCommand) Activator.CreateInstance(typeof(TCommand));
+                command.GetType().GetProperty(id, caseSensitive: false).SetValue(command, id);
+            }
+
             return Execute(command, cancellationToken);
         }
     }

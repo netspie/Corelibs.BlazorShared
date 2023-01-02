@@ -1,7 +1,10 @@
 ﻿using Common.Basic.Blocks;
 using Common.Basic.Collections;
 using Corelibs.Basic.Collections;
+using Corelibs.Basic.Net;
+using Corelibs.Basic.Reflection;
 using Mediator;
+using System.Reflection;
 
 namespace Corelibs.BlazorShared
 {
@@ -27,7 +30,8 @@ namespace Corelibs.BlazorShared
         protected Task<TResponse> GetResource<TApiQuery, TResponse>(TApiQuery apiQuery, string resourcePath, CancellationToken ct = default)
         {
             var queryString = apiQuery.GetQueryString();
-            var resourcePathWithQuery = $"{resourcePath}?{queryString}";
+            var resourcePathWithQuery = queryString.IsNullOrEmpty() ? resourcePath : $"{resourcePath}?{queryString}";
+            resourcePathWithQuery = resourcePathWithQuery.ReplaceParametersWithValues(apiQuery);
 
             return _clientFactory.GetResource<TResponse>(_signInRedirector, resourcePathWithQuery, ct);
         }
@@ -36,6 +40,7 @@ namespace Corelibs.BlazorShared
         {
             var queryString = apiQuery.GetQueryString(routeAttrType);
             var resourcePathWithQuery = queryString.IsNullOrEmpty() ? resourcePath : $"{resourcePath}?{queryString}";
+            resourcePathWithQuery = resourcePathWithQuery.ReplaceParametersWithValues(apiQuery);
 
             return _clientFactory.GetResource<TResponse>(_signInRedirector, resourcePathWithQuery, ct);
         }
@@ -47,16 +52,19 @@ namespace Corelibs.BlazorShared
 
         protected Task<HttpResponseMessage> PostResource<TBody>(string resourcePath, TBody body, CancellationToken ct = default)
         {
+            resourcePath = resourcePath.ReplaceParametersWithValues(body);
             return _clientFactory.PostResource(_signInRedirector, resourcePath, body, ct);
         }
 
         protected Task<HttpResponseMessage> PutResource<TBody>(string resourcePath, TBody body, CancellationToken ct = default)
         {
+            resourcePath = resourcePath.ReplaceParametersWithValues(body);
             return _clientFactory.PutResource(_signInRedirector, resourcePath, body, ct);
         }
 
         protected Task<HttpResponseMessage> PatchResource<TBody>(string resourcePath, TBody body, CancellationToken ct = default)
         {
+            resourcePath = resourcePath.ReplaceParametersWithValues(body);
             return _clientFactory.PatchResource(_signInRedirector, resourcePath, body, ct);
         }
     }
