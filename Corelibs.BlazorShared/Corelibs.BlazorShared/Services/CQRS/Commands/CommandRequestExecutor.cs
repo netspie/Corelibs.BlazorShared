@@ -56,6 +56,12 @@ namespace Corelibs.BlazorShared
             Add<TAppCommand>(c => PutResource<TAppCommand, TApiCommand>($"{fullResourceRoute}/{c.ID}", c));
         }
 
+        public void AddPatch<TAppCommand, TApiCommand>(string resourceRoute)
+        {
+            var fullResourceRoute = $"{_baseRoute}/{resourceRoute}";
+            Add<TAppCommand>(c => PatchResource<TAppCommand, TApiCommand>($"{fullResourceRoute}", c));
+        }
+
         public void AddPost<TAppCommand>(string resourceRoute)
         {
             var fullResourceRoute = $"{_baseRoute}/{resourceRoute}";

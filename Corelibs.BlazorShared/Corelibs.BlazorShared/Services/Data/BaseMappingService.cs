@@ -40,8 +40,6 @@ namespace Corelibs.BlazorShared
         }
 
         protected Task<HttpResponseMessage> PatchResource<TBody, TApiCommand>(string resourcePath, TBody body, CancellationToken ct = default)
-           where TBody : new()
-           where TApiCommand : new()
         {
             var apiCommand = _mapper.Map<TApiCommand>(body);
             return PatchResource(resourcePath, apiCommand, ct);
