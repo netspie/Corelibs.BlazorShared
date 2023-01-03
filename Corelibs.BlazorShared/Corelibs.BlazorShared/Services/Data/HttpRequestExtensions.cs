@@ -2,6 +2,7 @@
 using Corelibs.Basic.Collections;
 using Mediator;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Newtonsoft.Json.Linq;
 using System.Net.Http.Formatting;
 using System.Net.Http.Json;
 
@@ -66,10 +67,16 @@ namespace Corelibs.BlazorShared
             return SendResource(signInRedirector, clientName => clientFactory.PatchAsync(clientName, resourcePath, body, ct));
         }
 
-        public static Task<HttpResponseMessage> DeleteResource<TBody>(
+        public static Task<HttpResponseMessage> DeleteResource(
           this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, CancellationToken ct)
         {
             return SendResource(signInRedirector, clientName => clientFactory.DeleteAsync(clientName, resourcePath, ct));
+        }
+
+        public static Task<HttpResponseMessage> DeleteResource<TBody>(
+          this IHttpClientFactory clientFactory, ISignInRedirector signInRedirector, string resourcePath, TBody body, CancellationToken ct)
+        {
+            return SendResource(signInRedirector, clientName => clientFactory.DeleteAsync(clientName, resourcePath, body, ct));
         }
 
         private static async Task<HttpResponseMessage> SendResource(
@@ -122,6 +129,19 @@ namespace Corelibs.BlazorShared
 
         private static Task<HttpResponseMessage> DeleteAsync(this IHttpClientFactory clientFactory, string clientName, string resourcePath, CancellationToken ct) =>
             clientFactory.CreateClientAndSendRequest(clientName, client => client.DeleteAsync(resourcePath, ct));
+
+        private static Task<HttpResponseMessage> DeleteAsync<TBody>(this IHttpClientFactory clientFactory, string clientName, string resourcePath, TBody body, CancellationToken ct) =>
+            clientFactory.CreateClientAndSendRequest(clientName, client =>
+            {
+                HttpRequestMessage request = new HttpRequestMessage
+                {
+                    Content = JsonContent.Create(body),
+                    Method = HttpMethod.Delete,
+                    RequestUri = new Uri(resourcePath, UriKind.Relative)
+                };
+
+                return client.SendAsync(request, ct);
+            });
 
         private static Task<HttpResponseMessage> CreateClientAndSendRequest(this IHttpClientFactory clientFactory, string clientName, Func<HttpClient, Task<HttpResponseMessage>> request)
         {

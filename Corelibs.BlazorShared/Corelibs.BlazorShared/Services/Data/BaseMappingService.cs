@@ -44,5 +44,11 @@ namespace Corelibs.BlazorShared
             var apiCommand = _mapper.Map<TApiCommand>(body);
             return PatchResource(resourcePath, apiCommand, ct);
         }
+
+        protected Task<HttpResponseMessage> DeleteResource<TBody, TApiCommand>(string resourcePath, TBody body, CancellationToken ct = default)
+        {
+            var apiCommand = _mapper.Map<TApiCommand>(body);
+            return DeleteResource(resourcePath, apiCommand, ct);
+        }
     }
 }

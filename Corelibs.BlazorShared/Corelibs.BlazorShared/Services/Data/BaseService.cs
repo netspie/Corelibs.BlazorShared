@@ -67,5 +67,11 @@ namespace Corelibs.BlazorShared
             resourcePath = resourcePath.ReplaceParametersWithValues(body);
             return _clientFactory.PatchResource(_signInRedirector, resourcePath, body, ct);
         }
+
+        protected Task<HttpResponseMessage> DeleteResource<TBody>(string resourcePath, TBody body, CancellationToken ct = default)
+        {
+            resourcePath = resourcePath.ReplaceParametersWithValues(body);
+            return _clientFactory.DeleteResource(_signInRedirector, resourcePath, body, ct);
+        }
     }
 }
