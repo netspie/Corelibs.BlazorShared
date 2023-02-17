@@ -6,7 +6,6 @@ using Mediator;
 
 namespace Corelibs.BlazorShared
 {
-
     public class QueryRequestExecutor : BaseMappingService, IQueryExecutor
     {
         private readonly Dictionary<Type, Func<object, Task<object>>> _requestsPerType =
@@ -37,6 +36,16 @@ namespace Corelibs.BlazorShared
         {
             var fullResourceRoute = $"{_baseRoute}/{resourceRoute}";
             Add<TAppQuery, TAppQueryOut>(q => GetResource<TAppQueryOut, TApiQuery>(q, $"{fullResourceRoute}/{q.ID}", typeof(FromRouteAttribute)));
+        }
+
+        public void Add<TApiQuery, TAppQuery, TAppQueryOut>(Func<TAppQuery, string> getResourceRoute)
+            where TAppQuery : IQuery<Result<TAppQueryOut>>
+        {
+            Add<TAppQuery, TAppQueryOut>(q =>
+            {
+                var resourceRoute = getResourceRoute(q);
+                return GetResource<TAppQueryOut, TApiQuery>(q, $"{_baseRoute}/{resourceRoute}");
+            });
         }
     }
 }
