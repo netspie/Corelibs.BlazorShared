@@ -105,21 +105,4 @@ namespace Corelibs.BlazorShared.UI.Css
         public static implicit operator CssAttributeExt((double value, Unit unit) t) => new CssAttributeExt() { Value = t.value, Unit = t.unit };
         public static implicit operator CssAttributeExt((double value, double value2, Unit unit) t) => new CssAttributeExt { Value = t.value, Value2 = t.value2, Unit = t.unit };
     }
-
-    public static class StringExtensions
-    {
-        public static string PascalToKebabCase(this string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return value;
-
-            return Regex.Replace(
-                value,
-                "(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z0-9])",
-                "-$1",
-                RegexOptions.Compiled)
-                .Trim()
-                .ToLower();
-        }
-    }
 }

@@ -44,7 +44,7 @@ namespace Corelibs.BlazorShared
             Add<TAppQuery, TAppQueryOut>(q =>
             {
                 var resourceRoute = getResourceRoute(q);
-                return GetResource<TAppQueryOut, TApiQuery>(q, $"{_baseRoute}/{resourceRoute}");
+                return GetResource<TAppQueryOut, TApiQuery>(q, $"{_baseRoute}/{resourceRoute}", typeof(FromRouteAttribute));
             });
         }
     }
