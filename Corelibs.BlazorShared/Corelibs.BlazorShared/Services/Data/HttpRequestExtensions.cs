@@ -1,8 +1,4 @@
-﻿using Common.Basic.Blocks;
-using Corelibs.Basic.Collections;
-using Mediator;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using System.Net.Http.Formatting;
 using System.Net.Http.Json;
 
