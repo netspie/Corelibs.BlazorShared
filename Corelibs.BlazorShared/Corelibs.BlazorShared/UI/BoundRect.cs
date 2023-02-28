@@ -1,4 +1,5 @@
-﻿using Microsoft.JSInterop;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Corelibs.BlazorShared.UI
 {
@@ -19,6 +20,11 @@ namespace Corelibs.BlazorShared.UI
         public static ValueTask<BoundRect> GetRect(this IJSRuntime jsRuntime, string className)
         {
             return jsRuntime.InvokeAsync<BoundRect>("getBoundingClientRectByClass", className);
+        }
+
+        public static ValueTask<BoundRect> GetRect(this IJSRuntime jsRuntime, ElementReference reference)
+        {
+            return jsRuntime.InvokeAsync<BoundRect>("getBoundingClientRect", reference);
         }
     }
 }
