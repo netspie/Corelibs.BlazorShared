@@ -100,9 +100,7 @@ namespace Corelibs.BlazorShared.UI
 
         public static RenderTreeBuilder AddCssAttribute(this RenderTreeBuilder builder, ref int sequence, string name, double value)
         {
-            if (value is not 0)
-                builder.AddAttribute(sequence++, name, new CssAttribute(value));
-
+            builder.AddAttribute(sequence++, name, new CssAttribute(value));
             return builder;
         }
 
