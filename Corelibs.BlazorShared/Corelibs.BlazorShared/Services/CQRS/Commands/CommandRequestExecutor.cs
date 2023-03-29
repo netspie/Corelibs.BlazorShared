@@ -1,8 +1,5 @@
 ﻿using AutoMapper;
 using Common.Basic.Blocks;
-using Corelibs.Basic.Architecture.CQRS.Command.Types;
-using Mediator;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Corelibs.BlazorShared
 {
@@ -56,10 +53,9 @@ namespace Corelibs.BlazorShared
         }
 
         public void AddPut<TAppCommand, TApiCommand>(string resourceRoute)
-            where TAppCommand : IReplaceCommand
         {
             var fullResourceRoute = $"{_baseRoute}/{resourceRoute}";
-            Add<TAppCommand>(c => PutResource<TAppCommand, TApiCommand>($"{fullResourceRoute}/{c.ID}", c));
+            Add<TAppCommand>(c => PutResource<TAppCommand, TApiCommand>($"{fullResourceRoute}", c));
         }
 
         public void AddPatch<TAppCommand, TApiCommand>(string resourceRoute)
